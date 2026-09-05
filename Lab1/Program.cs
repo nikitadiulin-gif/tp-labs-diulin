@@ -102,7 +102,7 @@ namespace Lab1
         static void Function()
         {
             Console.WriteLine("\nЗадание 3: вычисление функции");
-            Console.Write("Введите x: ");
+            Console.Write("Введите x (0..4): ");
             if (!double.TryParse(Console.ReadLine(), out double x))
             {
                 Console.WriteLine("Ошибка: введите корректное число.");
@@ -117,16 +117,51 @@ namespace Lab1
             //проверка: ln(4/x) >= 0, значит  4/x >= 1  =>  x <= 4
             if (x > 4)
             {
-                Console.WriteLine($"Ошибка: под корнем отрицательное число (ln(4/{x:F4}) < 0)");
+                Console.WriteLine($"Ошибка: под корнем отрицательное число (ln(4/{x:F4}) < 0). Введите x от 0 до 4.");
                 return;
             }
             double ln = Math.Log(4.0 / x);          //логарифм
-            double sqrt = Math.Sqrt(lnPart);        //корень
+            double sqrt = Math.Sqrt(ln);        //корень
             double division = 1.0 / x;              //деление
             double exp = Math.Exp(Math.Sin(x));     //экспонента
 
-            double result = sqrtPart - divisionPart - expPart;
+            double result = sqrt - division - exp;
             Console.WriteLine($"A({x:F4}) = {result:F6}");
+        }
+        static void Taylor()
+        {
+            Console.WriteLine("\nЗадание 4: ряд Тейлора для arctg(x)");
+            Console.Write("Введите x (|x| <= 1): ");
+
+            if (!double.TryParse(Console.ReadLine(), out double x))
+            {
+                Console.WriteLine("Ошибка: введите корректное число.");
+                return;
+            }
+
+            if (Math.Abs(x) > 1)
+            {
+                Console.WriteLine("Ошибка: |x| должен быть <= 1");
+                return;
+            }
+            const double epsilon = 1e-6;        //точность вычисления
+            double sum = 0;                     //сумма членов ряда
+            double term = x;                    //первый член ряда
+            int n = 1;                          //степень первого члена
+            int terms = 0;                      // кол-во членов
+
+            while (Math.Abs(term) > epsilon)
+            {
+                sum += term;
+                terms++;
+                term *= -x * x * (2 * n - 1) / (2 * n + 1);
+                n++;
+            }
+            double mathResult = Math.Atan(x);
+            Console.WriteLine($"Ряд Тейлора:    {sum:F8}");
+            Console.WriteLine($"Math.Atan:      {mathResult:F8}");
+            Console.WriteLine($"Разница:        {Math.Abs(sum - mathResult):E}");
+            Console.WriteLine($"Количество членов: {terms}");
         }
     }
 }
