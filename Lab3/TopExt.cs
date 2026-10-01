@@ -19,6 +19,17 @@ public static class FolderStatsAnalyzer
         if (!Directory.Exists(folderPath))
             throw new DirectoryNotFoundException($"Папка не найдена: {folderPath}");
 
-        throw new NotImplementedException();
+        var files = Directory.EnumerateFiles(folderPath, "*", SearchOption.AllDirectories);
+
+        return files
+            .Select(path => new FileInfo(path))
+            .GroupBy(info => info.Extension.ToLowerInvariant())
+            .Select(group => new ExtensionStat(
+                Extension: group.Key,
+                Count: group.Count(),
+                TotalSizeBytes: group.Sum(f => f.Length)))
+            .OrderByDescending(stat => stat.Count)
+            .Take(topCount)
+            .ToList();
     }
 }
